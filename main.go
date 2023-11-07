@@ -9,7 +9,7 @@ import (
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Введите математическое выражение (например, '1 + 2' или 'VI / III'):")
+	fmt.Println("Введите математическое выражение (например, '1 + 2' или 'VI / III):")
 
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
@@ -54,20 +54,36 @@ func main() {
 
 func isRomanNumeral(input string) bool {
 	// Проверка, является ли строка римским числом
-	// Добавьте сюда свою реализацию проверки
-	return false
+	romanNumerals := map[rune]int{
+		'I': 1,
+		'V': 5,
+		'X': 10,
+		// Добавьте другие римские цифры по мере необходимости
+	}
+	for _, char := range input {
+		if _, ok := romanNumerals[char]; !ok {
+			return false
+		}
+	}
+	return true
 }
 
 func isArabicNumeral(input string) bool {
 	// Проверка, является ли строка арабским числом
-	// Добавьте сюда свою реализацию проверки
-	return false
+	_, err := strconv.Atoi(input)
+	return err == nil
 }
 
 func convertToNumber(input string) (int, error) {
 	// Преобразование строки в число
-	// Добавьте сюда свою реализацию преобразования
-	return 0, nil
+	if isRomanNumeral(input) {
+		return romanToArabic(input)
+	}
+	num, err := strconv.Atoi(input)
+	if err != nil {
+		return 0, err
+	}
+	return num, nil
 }
 
 func calculate(a, b int, operator string) (int, error) {
@@ -88,3 +104,29 @@ func calculate(a, b int, operator string) (int, error) {
 		return 0, fmt.Errorf("недопустимая операция")
 	}
 }
+
+func romanToArabic(roman string) (int, error) {
+	// Реализация преобразования римских чисел в арабские
+	romanNumerals := map[rune]int{
+		'I': 1,
+		'V': 5,
+		'X': 10,
+		'L': 50,
+		'C': 100,
+		'D': 500,
+		'M': 1000,
+	}
+	var result int
+	prevValue := 0
+	for i := len(roman) - 1; i >= 0; i-- {
+		value := romanNumerals[rune(roman[i)]
+		if value < prevValue {
+			result -= value
+		} else {
+			result += value
+		}
+		prevValue = value
+	}
+	return result, nil
+}
+
