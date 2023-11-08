@@ -11,8 +11,8 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Welcome to the Calculator App!")
-	fmt.Println("Enter an expression (e.g., 2 + 3):")
+	fmt.Println("Добро пожаловать в приложение Калькулятор!")
+	fmt.Println("Введите выражение (например, 2 + 3):")
 
 	for {
 		fmt.Print("> ")
@@ -20,38 +20,37 @@ func main() {
 		input = strings.TrimSpace(input)
 
 		if input == "exit" {
-			fmt.Println("Exiting the Calculator App...")
+			fmt.Println("Выход из приложения Калькулятор...")
 			break
 		}
 
 		result, err := evaluateExpression(input)
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("Ошибка:", err)
 		} else {
-			fmt.Println("Result:", result)
+			fmt.Println("Результат:", result)
 		}
 	}
 }
 
 func evaluateExpression(input string) (float64, error) {
-	// Split the input into operands and operator
-	tokens := strings.Split(input, " ")
+	input = strings.TrimSpace(input)
+	tokens := strings.Fields(input)
 	if len(tokens) != 3 {
-		return 0, fmt.Errorf("Invalid expression")
+		return 0, fmt.Errorf("Некорректное количество токенов в выражении")
 	}
 
-	// Parse the operands
 	operand1, err := strconv.ParseFloat(tokens[0], 64)
 	if err != nil {
-		return 0, fmt.Errorf("Invalid operand: %s", tokens[0])
+		return 0, fmt.Errorf("Некорректный операнд: %s", tokens[0])
 	}
 
 	operand2, err := strconv.ParseFloat(tokens[2], 64)
 	if err != nil {
-		return 0, fmt.Errorf("Invalid operand: %s", tokens[2])
+		return 0, fmt.Errorf("Некорректный операнд: %s", tokens[2])
 	}
 
-	// Perform the arithmetic operation
+	// Выполнение арифметической операции
 	operator := tokens[1]
 	var result float64
 
@@ -64,12 +63,16 @@ func evaluateExpression(input string) (float64, error) {
 		result = operand1 * operand2
 	case "/":
 		if operand2 == 0 {
-			return 0, fmt.Errorf("Division by zero")
+			return 0, fmt.Errorf("Деление на ноль")
 		}
 		result = operand1 / operand2
 	default:
-		return 0, fmt.Errorf("Invalid operator: %s", operator)
+		return 0, fmt.Errorf("Некорректный оператор: %s", operator)
 	}
 
 	return result, nil
 }
+
+
+
+
