@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"errors"
 )
 
 func main() {
@@ -49,7 +50,18 @@ func main() {
 	}
 
 	// Выводим результат
-	fmt.Println(result)
+	if isRomanNumeral(a) && isRomanNumeral(b) {
+		// Если оба операнда являются римскими числами, то результат тоже должен быть римским числом
+		romanResult, err := arabicToRoman(result)
+		if err != nil {
+			fmt.Println("Ошибка при преобразовании в римское число:", err)
+			return
+		}
+		fmt.Println(romanResult)
+	} else {
+		// Иначе выводим арабское число
+		fmt.Println(result)
+	}
 }
 
 func isRomanNumeral(input string) bool {
@@ -58,12 +70,27 @@ func isRomanNumeral(input string) bool {
 		'I': 1,
 		'V': 5,
 		'X': 10,
-		// Добавьте другие римские цифры по мере необходимости
+		'L': 50,
+		'C': 100,
+		'D': 500,
+		'M': 1000,
 	}
+	var prevValue int
+	var consecutiveFailures int
 	for _, char := range input {
-		if _, ok := romanNumerals[char]; !ok {
+		value, ok := romanNumerals[char]
+		if !ok {
 			return false
 		}
+		if value > prevValue {
+			consecutiveFailures = 0
+		} else if value < prevValue {
+			consecutiveFailures++
+			if consecutiveFailures > 1 {
+				return false // Римское число неверно сформировано
+			}
+		}
+		prevValue = value
 	}
 	return true
 }
@@ -83,6 +110,9 @@ func convertToNumber(input string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	if num < 1 || num > 10 {
+		return 0, errors.New("число вне допустимого диапазона (1-10)")
+	}
 	return num, nil
 }
 
@@ -90,19 +120,48 @@ func calculate(a, b int, operator string) (int, error) {
 	// Выполнение операции
 	switch operator {
 	case "+":
-		return a + b, nil
+		result := a + b
+		if isRomanNumeral(strconv.Itoa(a)) && isRomanNumeral(strconv.Itoa(b)) {
+			if result < 1 || result > 3999 {
+				return 0, errors.New("результат вне допустимого диапазона (1-3999)")
+			}
+		}
+		return result, nil
 	case "-":
-		return a - b, nil
+		result := a - b
+		if result < 1 {
+			return 0, errors.New("результат меньше 1 (римские числа не могут быть отрицательными)")
+		}
+		return result, nil
 	case "*":
-		return a * b, nil
+		result := a * b
+		if isRomanNumeral(strconv.Itoa(a)) && isRomanNumeral(strconv.Itoa(b)) {
+			if result < 1 || result > 3999 {
+				return 0, errors.New("результат вне допустимого диапазона (1-3999)")
+			}
+		}
+		return result, nil
 	case "/":
 		if b == 0 {
-			return 0, fmt.Errorf("деление на ноль")
+			return 0, errors.New("деление на ноль")
 		}
-		return a / b, nil
+		result := a / b
+		if isRomanNumeral(strconv.Itoa(a)) && isRomanNumeral(strconv.Itoa(b)) {
+			if result < 1 {
+				return 0, errors.New("результат меньше 1 (римские числа не могут быть отрицательными)")
+			}
+		}
+		return result, nil
 	default:
-		return 0, fmt.Errorf("недопустимая операция")
+		return 0, errors.New("недопустимая операция")
 	}
+}
+
+
+func arabicToRoman(arabic int) (string, error) {
+	// Преобразование арабских чисел в римские
+	// Добавьте сюда свою реализацию
+	return "", errors.New("преобразование арабских чисел в римские числа пока не реализовано")
 }
 
 func romanToArabic(roman string) (int, error) {
@@ -119,7 +178,7 @@ func romanToArabic(roman string) (int, error) {
 	var result int
 	prevValue := 0
 	for i := len(roman) - 1; i >= 0; i-- {
-		value := romanNumerals[rune(roman[i)]
+		value := romanNumerals[rune(roman[i])]
 		if value < prevValue {
 			result -= value
 		} else {
@@ -129,4 +188,3 @@ func romanToArabic(roman string) (int, error) {
 	}
 	return result, nil
 }
-
