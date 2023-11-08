@@ -157,7 +157,6 @@ func calculate(a, b int, operator string) (int, error) {
 	}
 }
 
-
 func arabicToRoman(arabic int) (string, error) {
 	// Преобразование арабских чисел в римские
 	// Добавьте сюда свою реализацию
